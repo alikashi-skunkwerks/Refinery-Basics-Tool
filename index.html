@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Basic Refinery Process Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f6f8fa; --bg2:#ffffff; --bg3:#f0f2f5; --bg4:#e2e6ea;
+  --border:#d0d7de; --border2:#b0b8c1;
+  --text:#1a1f2e; --text2:#444c56; --text3:#7a828e;
+  --accent:#1a65c8; --accent-dim:#dbeafe; --accent-text:#1a50a0;
+  --green:#1a7f3c; --green-dim:#dcfce7; --green-text:#15692f;
+  --amber:#92580a; --amber-dim:#fef3c7; --amber-text:#7a4a08;
+  --red:#c0392b; --red-dim:#fee2e2; --red-text:#a02020;
+  --teal:#0d7a82; --teal-dim:#ccf2f4; --teal-text:#0a6068;
+  --r:8px; --rl:12px;
+  --font:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --bot:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+
+/* DESKTOP LAYOUT */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{padding:20px 20px 14px;border-bottom:1px solid var(--border)}
+.logo-badge{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--amber-text);background:var(--amber-dim);padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:8px}
+.logo h1{font-size:15px;font-weight:600;color:var(--text);line-height:1.3}
+.logo p{font-size:11px;color:var(--text3);margin-top:3px}
+nav{padding:10px 8px;flex:1}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);padding:8px 12px 4px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent-text)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.65}
+.nav-item.active svg{opacity:1}
+.nav-count{margin-left:auto;font-size:10px;background:var(--bg4);color:var(--text3);padding:1px 6px;border-radius:10px}
+.sidebar-footer{padding:12px 14px;border-top:1px solid var(--border)}
+.admin-btn{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:12px;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .12s}
+.admin-btn:hover{border-color:var(--accent);color:var(--accent-text)}
+.admin-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-text)}
+.main{flex:1;padding:32px;max-width:960px}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+.page-header{margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.page-header h2{font-size:20px;font-weight:600}
+.page-header p{font-size:13px;color:var(--text2);margin-top:4px}
+
+/* PROCESS EXPLORER */
+.flow-strip{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:18px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl)}
+.flow-chip{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--bg3);color:var(--text2);cursor:pointer;border:1px solid var(--border);transition:all .12s;white-space:nowrap}
+.flow-chip:hover{border-color:var(--border2);color:var(--text)}
+.flow-chip.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-text)}
+.flow-arrow{color:var(--text3);font-size:11px}
+.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:18px}
+.proc-card{padding:14px;border-radius:var(--rl);border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .15s}
+.proc-card:hover{border-color:var(--border2);background:var(--bg3)}
+.proc-card.sel{border-color:var(--accent);background:var(--accent-dim)}
+.proc-card .icon{font-size:20px;margin-bottom:8px}
+.proc-card .name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.proc-card .tag{font-size:10px;color:var(--text3)}
+.proc-card.sel .name{color:var(--accent-text)}
+.detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;min-height:140px}
+.detail-panel h3{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.unit-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--bg4);color:var(--text3)}
+.detail-desc{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:14px}
+.qs-label{font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;margin-top:4px}
+.kpi-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.kpi-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px}
+.kpi-chip .val{font-size:12px;font-weight:600;color:var(--accent-text);font-family:var(--mono)}
+.kpi-chip .lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.q-list{display:flex;flex-direction:column;gap:6px}
+.q-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);line-height:1.55}
+.q-item:hover{border-color:var(--border2)}
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.disc{background:var(--teal-dim);color:var(--teal-text)}
+.tech{background:var(--accent-dim);color:var(--accent-text)}
+.pain{background:var(--amber-dim);color:var(--amber-text)}
+.placeholder-msg{text-align:center;padding:32px 20px;color:var(--text3);font-size:13px}
+.placeholder-msg .big{font-size:32px;margin-bottom:10px}
+
+/* QUESTIONS TAB */
+.q-section{margin-bottom:28px}
+.q-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.q-unit-label{font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+
+/* SEGMENTS */
+.seg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:12px}
+.seg-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.seg-icon{width:40px;height:40px;border-radius:var(--r);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.seg-header h3{font-size:15px;font-weight:600}
+.seg-contact{font-size:11px;color:var(--text3);margin-top:3px}
+.seg-desc{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:12px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px}
+.tag-pill{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+
+/* INTEL */
+.intel-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px;margin-bottom:10px}
+.intel-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.intel-source{font-size:12px;font-weight:600}
+.intel-date{font-size:11px;color:var(--text3);margin-left:auto}
+.intel-body{font-size:13px;color:var(--text2);line-height:1.75}
+.intel-area{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--green-dim);color:var(--green-text)}
+.intel-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:520px;padding:24px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.modal>p{font-size:13px;color:var(--text2);margin-bottom:16px}
+.modal-close{float:right;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px}
+.modal-close:hover{color:var(--text)}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+input[type=text],input[type=password],select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;margin-bottom:12px;outline:none;transition:border-color .12s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:90px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{padding:10px 18px;border-radius:var(--r);font-size:13px;font-family:var(--font);font-weight:500;cursor:pointer;border:none;transition:all .12s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#1558b0}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--text3)}
+.btn-danger{background:var(--red-dim);color:var(--red-text);border:1px solid var(--red);font-size:11px;padding:5px 10px;border-radius:var(--r);font-family:var(--font);cursor:pointer}
+.error-msg{font-size:12px;color:var(--red-text);margin-top:-8px;margin-bottom:10px}
+.success-msg{font-size:12px;color:var(--green-text);margin-bottom:8px}
+.note-actions{display:flex;align-items:center;gap:8px;margin-top:10px}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* MOBILE CHROME */
+.mobile-header{display:none;position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;align-items:center;justify-content:space-between}
+.mobile-header-title{font-size:15px;font-weight:600}
+.mobile-header-sub{font-size:11px;color:var(--text3)}
+.mobile-admin-btn{padding:7px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:12px;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:5px}
+.mobile-admin-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-text)}
+
+.bottom-bar{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bot);background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bottom-bar-inner{display:flex;height:100%}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--text3);font-size:10px;font-family:var(--font);font-weight:500;transition:color .12s;padding:0;position:relative}
+.tab-btn svg{width:20px;height:20px}
+.tab-btn.active{color:var(--accent)}
+.tab-count{position:absolute;top:6px;right:calc(50% - 18px);background:var(--accent);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .bottom-bar{display:block}
+  .mobile-header{display:flex}
+  .main{padding:14px 14px calc(var(--bot) + 16px + env(safe-area-inset-bottom,0px))}
+  .page-header{margin-bottom:16px;padding-bottom:12px}
+  .page-header h2{font-size:17px}
+  .proc-grid{grid-template-columns:repeat(2,1fr)}
+  .proc-card{padding:12px}
+  .flow-strip{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 10px}
+  .flow-strip::-webkit-scrollbar{display:none}
+  .flow-arrow{display:none}
+  .kpi-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+  .kpi-row::-webkit-scrollbar{display:none}
+  .kpi-chip{flex-shrink:0}
+  .q-unit-label{display:none}
+  .seg-card{padding:14px}
+  .form-row{grid-template-columns:1fr}
+  .overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:var(--rl) var(--rl) 0 0;max-width:100%;max-height:85vh}
+}
+@media(min-width:769px){
+  .bottom-bar{display:none!important}
+  .mobile-header{display:none!important}
+}
+.welcome-overlay{position:fixed;inset:0;background:rgba(15,20,35,.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.welcome-box{background:#fff;border-radius:16px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.welcome-header{background:linear-gradient(135deg,#1a50a0 0%,#1a65c8 100%);padding:28px 28px 22px;color:#fff}
+.welcome-header .w-badge{font-size:10px;font-weight:600;letter-spacing:.08em;background:rgba(255,255,255,.2);padding:3px 9px;border-radius:4px;display:inline-block;margin-bottom:10px}
+.welcome-header h2{font-size:20px;font-weight:600;margin-bottom:4px}
+.welcome-header p{font-size:13px;opacity:.8}
+.welcome-body{padding:24px 28px}
+.welcome-body>p{font-size:13px;color:#444c56;margin-bottom:16px;line-height:1.65}
+.welcome-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.w-step{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:#f0f2f5;border-radius:8px;border:1px solid #d0d7de}
+.w-step-num{width:28px;height:28px;border-radius:50%;background:#f0f2f5;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.w-step-text{font-size:13px;color:#1a1f2e;line-height:1.5}
+.w-step-text strong{display:block;font-weight:600;margin-bottom:1px}
+.w-step-text span{color:#444c56}
+.welcome-footer{padding:0 28px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.w-dont-show{display:flex;align-items:center;gap:7px;font-size:12px;color:#7a828e;cursor:pointer;user-select:none}
+.w-dont-show input{width:14px;height:14px;cursor:pointer;accent-color:#1a65c8}
+@media(max-width:768px){
+  .welcome-box{max-width:100%}
+  .welcome-header{padding:22px 20px 18px}
+  .welcome-body{padding:18px 20px}
+  .welcome-footer{padding:0 20px 20px;flex-direction:column;align-items:stretch;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME / HOW TO OPEN MODAL -->
+<div class="welcome-overlay" id="welcome-overlay">
+  <div class="welcome-box">
+    <div class="welcome-header">
+      <div class="w-badge">Radix BA Enablement</div>
+      <h2>Refinery Basics Tool</h2>
+      <p>Your pre-call reference for discovery conversations</p>
+    </div>
+    <div class="welcome-body">
+      <p>This tool helps provide you with a basic understanding how a refinery works, what questions to ask, and what your team has already learned. Four sections:</p>
+      <div class="welcome-steps">
+        <div class="w-step">
+          <div class="w-step-num">⚙️</div>
+          <div class="w-step-text">
+            <strong>Process Explorer</strong>
+            <span>Tap any refinery unit — CDU, FCC, hydrocracker, DCS, and more — to see what it does, the KPIs that drive decisions there, and ready-to-use discovery questions for that unit.</span>
+          </div>
+        </div>
+        <div class="w-step">
+          <div class="w-step-num">❓</div>
+          <div class="w-step-text">
+            <strong>Discovery Questions</strong>
+            <span>The full question bank organized by intent: Discovery (understand their landscape), Tech Fit (where your capabilities apply), and Pain Points (where deals start).</span>
+          </div>
+        </div>
+        <div class="w-step">
+          <div class="w-step-num">🏭</div>
+          <div class="w-step-text">
+            <strong>Business Segments</strong>
+            <span>MPC has three distinct P&Ls — Refining & Marketing, Midstream (MPLX), and Renewable Diesel. Each has different buyers and different tech priorities. Know which one you're talking to.</span>
+          </div>
+        </div>
+        <div class="w-step">
+          <div class="w-step-num">📋</div>
+          <div class="w-step-text">
+            <strong>Field Intel</strong>
+            <span>Real notes from client conversations — what we've heard, who said it, and what it means for our approach. Admins keep this updated. Read it before every call.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="welcome-footer">
+      <label class="w-dont-show">
+        <input type="checkbox" id="dont-show-again"> Don't show this again
+      </label>
+      <button class="btn btn-primary" onclick="dismissWelcome()">Get started →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE TOP HEADER -->
+<header class="mobile-header">
+  <div>
+    <div class="mobile-header-title">Refinery Basics Tool</div>
+    <div class="mobile-header-sub">Radix BA Enablement</div>
+  </div>
+  <button class="mobile-admin-btn" id="mobile-admin-btn" onclick="openAdminFlow()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span id="mobile-admin-label">Admin</span>
+  </button>
+</header>
+
+<div class="shell">
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-badge">Internal use only</div>
+      <h1>Refinery Basics Tool</h1>
+      <p>Radix BA Enablement</p>
+    </div>
+    <nav>
+      <div class="nav-label">Learn</div>
+      <button class="nav-item active" onclick="go('explorer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Process explorer
+      </button>
+      <button class="nav-item" onclick="go('questions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        Discovery questions
+      </button>
+      <div class="nav-label" style="margin-top:8px">Refinery Context</div>
+      <button class="nav-item" onclick="go('segments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+        Business segments
+      </button>
+      <button class="nav-item" onclick="go('intel')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Field intel
+        <span class="nav-count" id="intel-count-sidebar">0</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminFlow()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="admin-btn-label">Admin login</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div id="sec-explorer" class="section active">
+      <div class="page-header">
+        <h2>Refinery process explorer</h2>
+        <p>Select any unit to understand what it does, what drives decisions there, and the right questions to ask.</p>
+      </div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">CRUDE FLOW — LEFT TO RIGHT</div>
+      <div class="flow-strip" id="flow-strip"></div>
+      <div class="proc-grid" id="proc-grid"></div>
+      <div class="detail-panel" id="detail-panel">
+        <div class="placeholder-msg"><div class="big">⚙️</div>Select a process unit above to see details, KPIs, and discovery questions.</div>
+      </div>
+    </div>
+
+    <div id="sec-questions" class="section">
+      <div class="page-header">
+        <h2>Discovery question bank</h2>
+        <p>Organized by intent. Use before calls to prep — and after to identify gaps.</p>
+      </div>
+      <div id="all-questions"></div>
+    </div>
+
+    <div id="sec-segments" class="section">
+      <div class="page-header">
+        <h2>MPC Business Segments (Based on public disclosures)</h2>
+        <p>Three distinct P&Ls, three different buying centers. Know which one you're in.</p>
+      </div>
+      <div id="segments-content"></div>
+    </div>
+
+    <div id="sec-intel" class="section">
+      <div class="page-header">
+        <h2>Field intelligence</h2>
+        <p>Notes from client conversations. Admins add and manage — all BAs can read.</p>
+      </div>
+      <div id="intel-feed"></div>
+    </div>
+  </main>
+</div>
+
+<!-- MOBILE BOTTOM TAB BAR -->
+<nav class="bottom-bar">
+  <div class="bottom-bar-inner">
+    <button class="tab-btn active" id="tab-explorer" onclick="go('explorer')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Explorer
+    </button>
+    <button class="tab-btn" id="tab-questions" onclick="go('questions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      Questions
+    </button>
+    <button class="tab-btn" id="tab-segments" onclick="go('segments')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+      Segments
+    </button>
+    <button class="tab-btn" id="tab-intel" onclick="go('intel')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Intel
+      <span class="tab-count" id="intel-count-tab" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div class="overlay" id="login-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
+    <h3>🔒 Admin login</h3>
+    <p>Enter the admin password to add and manage field intel notes.</p>
+    <label>Password</label>
+    <input type="password" id="login-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password"/>
+    <div class="error-msg" id="login-error" style="display:none">Incorrect password. Try again.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="doLogin()">Login</button>
+      <button class="btn btn-ghost" onclick="closeModal('login-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD NOTE MODAL -->
+<div class="overlay" id="add-note-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-note-modal')">✕</button>
+    <h3>Add field note</h3>
+    <p>Paste in what you heard — pain points, vendors, priorities, org dynamics, verbatim quotes.</p>
+    <div class="form-row">
+      <div>
+        <label>Stakeholder / meeting context</label>
+        <input type="text" id="note-source" placeholder="e.g. Garyville process eng, intro call"/>
+      </div>
+      <div>
+        <label>Process area</label>
+        <select id="note-area">
+          <option>General</option>
+          <option>Crude distillation</option>
+          <option>FCC / fluid catalytic cracking</option>
+          <option>Hydrocracking</option>
+          <option>Coking</option>
+          <option>Hydrotreating</option>
+          <option>Catalytic reforming</option>
+          <option>Blending &amp; product rundown</option>
+          <option>Utilities &amp; reliability</option>
+          <option>Control systems &amp; automation</option>
+          <option>Midstream / logistics</option>
+          <option>Renewable diesel</option>
+          <option>Enterprise / IT</option>
+        </select>
+      </div>
+    </div>
+    <label>Note</label>
+    <textarea id="note-body" placeholder="What did you hear? Pain points, vendors, budget cycles, org dynamics, verbatim quotes..."></textarea>
+    <div class="success-msg" id="note-success" style="display:none">✓ Note saved.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="saveNote()">Save note</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-note-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL MODAL -->
+<div class="overlay" id="admin-modal">
+  <div class="modal" style="max-width:600px">
+    <button class="modal-close" onclick="closeModal('admin-modal')">✕</button>
+    <h3>Admin panel</h3>
+    <p>Manage field intel notes. Changes save to this browser's local storage.</p>
+    <button class="btn btn-primary" onclick="openAddNote()" style="margin-bottom:16px">+ Add new note</button>
+    <div id="admin-notes-list"></div>
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <button class="btn btn-ghost" onclick="doLogout()">Log out</button>
+      <button class="btn-danger" onclick="confirmClearAll()">Clear all notes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = 'marathon2025';
+
+const PROCESSES = [
+  {id:'cdu',name:'Crude distillation',tag:'Upstream input',icon:'🛢️',flow:1,
+   desc:'The front door of every refinery. Crude oil is heated to ~700°F and fed into an atmospheric distillation tower. Hydrocarbons separate by boiling point — naphtha at the top, middle distillates in the middle, heavy residue at the bottom. Sets the volume and product mix for everything downstream.',
+   kpis:[{k:'Feed rate',v:'Capacity driver'},{k:'Cut point control',v:'Product yield signal'},{k:'Energy intensity',v:'BTU/bbl cost lever'},{k:'Preheat efficiency',v:'Heat integration target'}],
+   questions:[
+     {q:'What crude slates are you processing today vs. 5 years ago — more heavy sour crudes or lighter shale?',t:'disc'},
+     {q:'How are you managing preheat train fouling — scheduled or reactive?',t:'pain'},
+     {q:'What does your crude scheduling and blend optimization workflow look like today?',t:'tech'},
+     {q:'Is energy intensity per barrel a KPI your operations team is actively measured on?',t:'disc'},
+   ]},
+  {id:'vdu',name:'Vacuum distillation',tag:'Heavy cut recovery',icon:'🔽',flow:2,
+   desc:'Residue from the CDU is further separated under vacuum to produce VGO (vacuum gas oil) — the primary feed for downstream crackers — and vacuum residue that goes to the coker. Critical for maximizing value from heavy crude.',
+   kpis:[{k:'VGO yield',v:'Cracker feed quality'},{k:'Vacuum level control',v:'Separation efficiency'},{k:'HVGO/LVGO split',v:'Cracker feed optimization'}],
+   questions:[
+     {q:'What percent of your crude slate ends up as vacuum residue — and where does it go?',t:'disc'},
+     {q:'Are you running coking or visbreaking on the bottoms, or selling residual fuel oil?',t:'disc'},
+     {q:'Is VGO quality variability causing downstream cracker performance issues?',t:'pain'},
+   ]},
+  {id:'fcc',name:'FCC',tag:'Primary profit engine',icon:'🔥',flow:3,
+   desc:"The fluid catalytic cracker is the refinery's primary profit engine. It converts VGO into high-octane gasoline, LPG, and distillates using a fluidized catalyst. Yield and selectivity are highly sensitive to feed quality, catalyst activity, and reactor conditions. Most refineries have a dedicated control room for this unit alone.",
+   kpis:[{k:'Conversion rate',v:'Volume % cracked'},{k:'Coke yield',v:'Regenerator heat balance'},{k:'Cat/oil ratio',v:'Catalyst activity signal'},{k:'Gasoline octane',v:'RVP & blending spec'}],
+   questions:[
+     {q:'How are you currently optimizing FCC feed blend — manual or APC-driven?',t:'tech'},
+     {q:"What's your catalyst management strategy — in-house or vendor-managed?",t:'disc'},
+     {q:"Where do you feel you're leaving yield on the table in the FCC today?",t:'pain'},
+     {q:'Is your FCC running close to throughput limits — what constrains you?',t:'disc'},
+   ]},
+  {id:'hcc',name:'Hydrocracking',tag:'Premium middle distillates',icon:'⚗️',flow:4,
+   desc:"Uses hydrogen under high pressure to convert heavy VGO into premium middle distillates — jet fuel, diesel, and naphtha. Produces very clean, low-sulfur products. Capital intensive with significant hydrogen consumption. MPC's Garyville and Galveston Bay refineries have substantial hydrocracking capacity.",
+   kpis:[{k:'Hydrogen consumption',v:'H2 plant sizing'},{k:'Product sulfur',v:'ULSD compliance'},{k:'Catalyst cycle length',v:'Turnaround planning'},{k:'LHSV',v:'Throughput vs. conversion'}],
+   questions:[
+     {q:'How are you managing hydrogen supply — onsite SMR or merchant purchase?',t:'disc'},
+     {q:'What visibility do you have into hydrocracker catalyst deactivation trends?',t:'tech'},
+     {q:'With ULSD specs tightening, is your hydrotreater capacity currently a bottleneck?',t:'pain'},
+   ]},
+  {id:'coker',name:'Coking',tag:'Residue upgrade',icon:'🧱',flow:5,
+   desc:'Converts the lowest-value residue into lighter, more valuable products via thermal cracking in large drums. One drum fills while the other is drilled out. Byproduct is petroleum coke. Highly cyclical — a significant reliability and scheduling challenge.',
+   kpis:[{k:'Drum cycle time',v:'Throughput constraint'},{k:'Coke quality (S/metals)',v:'Marketability'},{k:'Drum switch reliability',v:'Uptime critical'},{k:'Liquid yield',v:'Conversion efficiency'}],
+   questions:[
+     {q:'How are you managing drum inspection and coke cutting — manual or automated?',t:'tech'},
+     {q:"What's the biggest reliability risk in your coker right now?",t:'pain'},
+     {q:'Is petroleum coke marketed as fuel-grade or calcined-grade — does that affect crude selection?',t:'disc'},
+   ]},
+  {id:'hdt',name:'Hydrotreating',tag:'Sulfur removal',icon:'🧪',flow:6,
+   desc:'Multiple hydrotreating units run throughout the refinery — on naphtha before reforming, on diesel for ULSD specs, and on FCC feed. Uses hydrogen to remove sulfur, nitrogen, and metals. With EPA ULSD at <15ppm, this is non-negotiable. Catalyst management and H2 availability are key levers.',
+   kpis:[{k:'Product sulfur',v:'Regulatory compliance'},{k:'H2 partial pressure',v:'Severity control'},{k:'WABT run rate',v:'Catalyst deactivation proxy'},{k:'Cycle life vs. target',v:'Turnaround planning'}],
+   questions:[
+     {q:'How do you track WABT progression across hydrotreater reactor beds in real time?',t:'tech'},
+     {q:'Are you running separate feed hydrotreaters for diesel and FCC feed, or combined?',t:'disc'},
+     {q:"What's your cycle life target before catalyst change-out — and are you hitting it?",t:'pain'},
+   ]},
+  {id:'reform',name:'Catalytic reforming',tag:'Octane & hydrogen',icon:'🔄',flow:7,
+   desc:'Takes naphtha and reforms the molecular structure to produce high-octane reformate for gasoline blending, plus hydrogen as a byproduct — critical feedstock for hydrotreaters. Catalyst regeneration strategy (continuous or semi-regen) drives operational complexity.',
+   kpis:[{k:'RON octane',v:'Gasoline pool upgrade'},{k:'H2 purity',v:'Hydrotreater feed quality'},{k:'Catalyst regen cycle',v:'Turnaround planning'},{k:'C5+ reformate yield',v:'Liquid recovery'}],
+   questions:[
+     {q:"Is your reformer CCR or semi-regen — what's the regeneration strategy?",t:'disc'},
+     {q:'How tightly integrated is your H2 balance across the reformer and hydrotreating network?',t:'tech'},
+     {q:'Are you using reformate octane to manage gasoline pool quality in real time?',t:'tech'},
+   ]},
+  {id:'blend',name:'Blending & rundown',tag:'Product finishing',icon:'🔀',flow:8,
+   desc:"All intermediate streams flow to blending where they're mixed to meet final product specs — RVP, octane, cloud point, sulfur, viscosity. Where yield optimization becomes commercial optimization. Inline quality analyzers, real-time lab integration, and blend scheduling are major tech opportunities.",
+   kpis:[{k:'RVP giveaway',v:'Largest value-loss point'},{k:'Blend recipe cycle time',v:'Scheduling responsiveness'},{k:'Analyzer uptime',v:'Lab cost avoidance'},{k:'Spec giveaway',v:'Blend cost efficiency'}],
+   questions:[
+     {q:"What's your current blend optimization setup — manual, spreadsheet, or a commercial optimizer?",t:'tech'},
+     {q:'How are you capturing quality data during blending — inline analyzers, at-line, or lab only?',t:'tech'},
+     {q:'Do you have visibility into blend component costs in real time, or is that post-accounting?',t:'pain'},
+     {q:'How much RVP giveaway are you seeing — do you quantify that as a dollar figure?',t:'pain'},
+   ]},
+  {id:'util',name:'Utilities & reliability',tag:'Plant infrastructure',icon:'⚡',flow:9,
+   desc:'Steam, power, cooling water, instrument air, and nitrogen keep everything else running. Reliability and mechanical integrity programs — RBI, FMEA, predictive maintenance — live here. MPC has significant captive power generation including cogeneration assets.',
+   kpis:[{k:'Steam balance',v:'Energy integration'},{k:'OEE',v:'Asset utilization'},{k:'MTBF',v:'Reliability output'},{k:'Energy $/bbl',v:'Utility cost benchmark'}],
+   questions:[
+     {q:"What's your current state on predictive maintenance — vibration analysis, FLIR, or ultrasonic on rotating equipment?",t:'tech'},
+     {q:'How is reliability engineering resourced — centralized or embedded by unit?',t:'disc'},
+     {q:'What does your RBI program look like — what tools are you using?',t:'tech'},
+     {q:'Where are your biggest unplanned downtime contributors right now?',t:'pain'},
+   ]},
+  {id:'dcs',name:'Control systems & automation',tag:'Digital backbone',icon:'💻',flow:10,
+   desc:'DCS, SIS, and APC layers are the OT core. Most refineries run a mix of legacy DCS (Honeywell, Emerson, Yokogawa, ABB) with newer APC overlays. Cybersecurity, OT/IT convergence, and historian data quality are live issues at every major refinery.',
+   kpis:[{k:'APC coverage',v:'% of units under APC'},{k:'APC benefit capture',v:'Value realization'},{k:'DCS age',v:'Replacement cycle indicator'},{k:'Historian data quality',v:'Analytics readiness'}],
+   questions:[
+     {q:'What DCS platforms are you running — Honeywell Experion, Emerson DeltaV, Yokogawa CENTUM?',t:'tech'},
+     {q:"What percentage of your major units are running APC today — and what's the target?",t:'tech'},
+     {q:'How are you thinking about OT cybersecurity — air-gapped or converging OT/IT?',t:'pain'},
+     {q:'Is there a historian migration or upgrade underway — PI System, IP21, or cloud historian?',t:'tech'},
+     {q:'Where does data analytics currently live — centralized data science team, site engineers, or both?',t:'disc'},
+   ]},
+];
+
+const SEGMENTS = [
+  {name:'Refining & marketing',icon:'🏭',
+   desc:'The core business — 13 refineries, ~3M bpcd crude capacity across Gulf Coast, Mid-Continent, and West Coast. This is where the OT, reliability, process optimization, and energy management budget lives. Treat every refinery site as a semi-autonomous account.',
+   contact:'Plant managers, refinery ops VPs, process engineers, reliability leads, site IT',
+   subs:['Process optimization & APC','Energy management','Reliability / predictive maintenance','Environmental compliance (ULSD, RFS, CAA)','OT cybersecurity','Turnaround planning & execution','Historian & data infrastructure']},
+  {name:'Midstream — MPLX LP',icon:'🔗',
+   desc:'A separate publicly traded MLP (~64% owned by MPC). Operates pipelines, terminals, barge fleets, gas processing plants, and NGL fractionators. ~21,000 miles of pipeline, 40M bbl terminal storage. Separate P&L — treat as a distinct account with different buyers.',
+   contact:'MPLX operations, terminal managers, pipeline integrity teams, SCADA engineers',
+   subs:['Pipeline monitoring & integrity','Terminal automation & scheduling','SCADA & control systems','Gas processing optimization','NGL fractionation efficiency','Logistics & movement scheduling']},
+  {name:'Renewable diesel',icon:'🌱',
+   desc:'Growing segment. Dickinson ND (184M gal/yr) and Martinez CA (730M gal/yr). Processes soybean oil, used cooking oil, tallow. Different unit ops from petroleum refining — feedstock variability and RFS compliance are the primary complexity drivers.',
+   contact:'Renewable fuels operations, sustainability/ESG teams, feedstock procurement',
+   subs:['Feedstock quality & variability management','RFS compliance & RIN tracking','Process control for novel unit ops','Yield optimization on diverse feedstocks','Carbon intensity monitoring']},
+];
+
+// STATE
+let isAdmin = false, selectedProc = null;
+const KEY = 'mpc_intel_notes_v1';
+const loadNotes = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } };
+const saveNotes = n => localStorage.setItem(KEY, JSON.stringify(n));
+
+// Seed
+if (!loadNotes().length) saveNotes([
+  {id:1,source:'Garyville — process engineer (intro call)',area:'Control systems & automation',
+   body:"Currently running Honeywell Experion DCS at Garyville. APC system hasn't been tuned in 18 months — engineer said \"the benefits are eroding.\" Clear opening for APC performance services. Running OSIsoft PI historian but lack analytics staff to get value from it.",date:'May 2025'},
+  {id:2,source:'Corporate IT procurement — vendor briefing',area:'Enterprise / IT',
+   body:'MPC runs SAP S/4HANA across corporate. Exploring edge computing for refinery data infrastructure. Had a bad experience with a prior SI on an MES project — sensitivity around implementation quality. Lead with outcomes and references, not features.',date:'Apr 2025'},
+]);
+
+// NAV
+function go(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const sb = document.querySelector(`.nav-item[onclick="go('${name}')"]`);
+  if (sb) sb.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const tb = document.getElementById('tab-' + name);
+  if (tb) tb.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// PROCESS EXPLORER
+function renderFlowStrip() {
+  const sorted = [...PROCESSES].sort((a,b) => a.flow - b.flow);
+  document.getElementById('flow-strip').innerHTML = sorted.map((p,i) =>
+    `<span class="flow-chip ${selectedProc===p.id?'sel':''}" onclick="selectProc('${p.id}')">${p.name}</span>` +
+    (i < sorted.length-1 ? '<span class="flow-arrow">→</span>' : '')
+  ).join('');
+}
+function renderGrid() {
+  document.getElementById('proc-grid').innerHTML = PROCESSES.map(p =>
+    `<div class="proc-card ${selectedProc===p.id?'sel':''}" onclick="selectProc('${p.id}')">
+      <div class="icon">${p.icon}</div><div class="name">${p.name}</div><div class="tag">${p.tag}</div>
+    </div>`
+  ).join('');
+}
+function selectProc(id) {
+  selectedProc = id; renderGrid(); renderFlowStrip();
+  const p = PROCESSES.find(x => x.id === id); if (!p) return;
+  document.getElementById('detail-panel').innerHTML = `
+    <h3>${p.icon} ${p.name} <span class="unit-tag">${p.tag}</span></h3>
+    <p class="detail-desc">${p.desc}</p>
+    <div class="qs-label">Typical KPIs</div>
+    <div class="kpi-row">${p.kpis.map(k=>`<div class="kpi-chip"><div class="val">${k.v}</div><div class="lbl">${k.k}</div></div>`).join('')}</div>
+    <div class="qs-label">Discovery questions for this unit</div>
+    <div class="q-list">${p.questions.map(q=>`
+      <div class="q-item">
+        <span class="badge ${q.t==='disc'?'disc':q.t==='tech'?'tech':'pain'}">${q.t==='disc'?'Discovery':q.t==='tech'?'Tech fit':'Pain point'}</span>
+        <span>${q.q}</span>
+      </div>`).join('')}
+    </div>`;
+  setTimeout(() => document.getElementById('detail-panel').scrollIntoView({behavior:'smooth',block:'nearest'}), 60);
+}
+
+// ALL QUESTIONS
+function renderAllQuestions() {
+  const byType = {disc:[],tech:[],pain:[]};
+  PROCESSES.forEach(p => p.questions.forEach(q => byType[q.t].push({...q,unit:p.name})));
+  const labels = {
+    disc:{label:'Discovery',desc:'Understand their landscape before pitching anything'},
+    tech:{label:'Tech fit',desc:'Identify where your capabilities apply'},
+    pain:{label:'Pain points',desc:"Surface problems they need solved — this is where deals start"},
+  };
+  document.getElementById('all-questions').innerHTML = Object.entries(byType).map(([t,qs])=>`
+    <div class="q-section">
+      <div class="q-section-header">
+        <span class="badge ${t}">${labels[t].label}</span>
+        <span style="font-size:13px;color:var(--text3)">${labels[t].desc}</span>
+      </div>
+      <div class="q-list">${qs.map(q=>`
+        <div class="q-item">
+          <span class="q-unit-label">${q.unit}</span>
+          <span>${q.q}</span>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// SEGMENTS
+function renderSegments() {
+  document.getElementById('segments-content').innerHTML = SEGMENTS.map(s=>`
+    <div class="seg-card">
+      <div class="seg-header">
+        <div class="seg-icon">${s.icon}</div>
+        <div><h3>${s.name}</h3><div class="seg-contact">${s.contact}</div></div>
+      </div>
+      <p class="seg-desc">${s.desc}</p>
+      <div class="tag-cloud">${s.subs.map(sub=>`<span class="tag-pill">${sub}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// INTEL
+function updateCounts() {
+  const n = loadNotes().length;
+  document.getElementById('intel-count-sidebar').textContent = n;
+  const tc = document.getElementById('intel-count-tab');
+  tc.textContent = n; tc.style.display = n > 0 ? 'flex' : 'none';
+}
+function renderIntel() {
+  updateCounts();
+  const notes = loadNotes();
+  const feed = document.getElementById('intel-feed');
+  if (!notes.length) { feed.innerHTML = '<div class="intel-empty">No field notes yet. An admin can add the first one.</div>'; return; }
+  feed.innerHTML = [...notes].reverse().map(n=>`
+    <div class="intel-card">
+      <div class="intel-meta">
+        <span class="intel-source">${n.source}</span>
+        <span class="intel-area">${n.area}</span>
+        <span class="intel-date">${n.date}</span>
+      </div>
+      <div class="intel-body">${n.body}</div>
+    </div>`).join('');
+}
+
+// ADMIN
+function setAdminUI(on) {
+  document.getElementById('admin-btn-label').textContent = on ? 'Admin panel' : 'Admin login';
+  document.getElementById('admin-toggle-btn').classList.toggle('active', on);
+  document.getElementById('mobile-admin-btn').classList.toggle('active', on);
+}
+function openAdminFlow() {
+  if (isAdmin) { openAdminPanel(); return; }
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  openModal('login-modal');
+  setTimeout(() => document.getElementById('login-pw').focus(), 300);
+}
+function doLogin() {
+  if (document.getElementById('login-pw').value === ADMIN_PASSWORD) {
+    isAdmin = true; closeModal('login-modal'); setAdminUI(true); openAdminPanel();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-pw').value = '';
+    document.getElementById('login-pw').focus();
+  }
+}
+function doLogout() { isAdmin = false; closeModal('admin-modal'); setAdminUI(false); }
+function openAdminPanel() { renderAdminNotes(); openModal('admin-modal'); }
+function renderAdminNotes() {
+  const notes = loadNotes();
+  const list = document.getElementById('admin-notes-list');
+  if (!notes.length) { list.innerHTML = '<p style="color:var(--text3);font-size:13px;margin-bottom:8px">No notes yet.</p>'; return; }
+  list.innerHTML = [...notes].reverse().map(n=>`
+    <div class="intel-card">
+      <div class="intel-meta">
+        <span class="intel-source">${n.source}</span>
+        <span class="intel-area">${n.area}</span>
+        <span class="intel-date">${n.date}</span>
+      </div>
+      <div class="intel-body">${n.body}</div>
+      <div class="note-actions"><button class="btn-danger" onclick="deleteNote(${n.id})">Delete</button></div>
+    </div>`).join('');
+}
+function openAddNote() {
+  closeModal('admin-modal');
+  ['note-source','note-body'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('note-area').value = 'General';
+  document.getElementById('note-success').style.display = 'none';
+  openModal('add-note-modal');
+}
+function saveNote() {
+  const src = document.getElementById('note-source').value.trim();
+  const area = document.getElementById('note-area').value;
+  const body = document.getElementById('note-body').value.trim();
+  if (!src || !body) { alert('Please fill in source and note fields.'); return; }
+  const notes = loadNotes();
+  notes.push({id:Date.now(),source:src,area,body,date:new Date().toLocaleString('en-US',{month:'short',year:'numeric'})});
+  saveNotes(notes); renderIntel();
+  ['note-source','note-body'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('note-area').value = 'General';
+  document.getElementById('note-success').style.display = 'block';
+  setTimeout(() => document.getElementById('note-success').style.display = 'none', 2500);
+}
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  saveNotes(loadNotes().filter(n => n.id !== id)); renderIntel(); renderAdminNotes();
+}
+function confirmClearAll() {
+  if (!confirm('Delete ALL field notes? This cannot be undone.')) return;
+  saveNotes([]); renderIntel(); renderAdminNotes();
+}
+
+// MODALS
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(el =>
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); })
+);
+
+// WELCOME MODAL
+const WELCOME_KEY = 'rbt_welcome_dismissed';
+function dismissWelcome() {
+  if (document.getElementById('dont-show-again').checked) {
+    localStorage.setItem(WELCOME_KEY, '1');
+  }
+  document.getElementById('welcome-overlay').style.display = 'none';
+}
+if (localStorage.getItem(WELCOME_KEY)) {
+  document.getElementById('welcome-overlay').style.display = 'none';
+}
+
+// INIT
+renderFlowStrip(); renderGrid(); renderAllQuestions(); renderSegments(); renderIntel();
+</script>
+</body>
+</html>
