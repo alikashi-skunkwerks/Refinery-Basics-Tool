@@ -53,21 +53,104 @@ nav{padding:10px 8px;flex:1}
 .page-header h2{font-size:20px;font-weight:600}
 .page-header p{font-size:13px;color:var(--text2);margin-top:4px}
 
-/* PROCESS EXPLORER */
-.flow-strip{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:18px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl)}
-.flow-chip{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--bg3);color:var(--text2);cursor:pointer;border:1px solid var(--border);transition:all .12s;white-space:nowrap}
-.flow-chip:hover{border-color:var(--border2);color:var(--text)}
-.flow-chip.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-text)}
-.flow-arrow{color:var(--text3);font-size:11px}
-.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:18px}
-.proc-card{padding:14px;border-radius:var(--rl);border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .15s}
-.proc-card:hover{border-color:var(--border2);background:var(--bg3)}
-.proc-card.sel{border-color:var(--accent);background:var(--accent-dim)}
-.proc-card .icon{font-size:20px;margin-bottom:8px}
-.proc-card .name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.proc-card .tag{font-size:10px;color:var(--text3)}
-.proc-card.sel .name{color:var(--accent-text)}
-.detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;min-height:140px}
+/* PROCESS EXPLORER — FUNCTIONAL DIAGRAM */
+.flow-diagram{margin-bottom:20px}
+
+/* Legend row */
+.flow-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Main flow row */
+.flow-main{display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.flow-main::-webkit-scrollbar{display:none}
+
+/* Crude input column */
+.crude-col{display:flex;flex-direction:column;align-items:center;
+  background:#fdf6e8;border:1.5px solid #e0b84a;border-radius:var(--rl);
+  padding:0 10px 12px;width:88px;flex-shrink:0;text-align:center}
+.crude-col-icon{font-size:22px;height:40px;display:flex;align-items:center;justify-content:center;width:100%}
+.crude-col-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a5010;margin-bottom:5px}
+.crude-col-sub{font-size:10px;color:#a07030;line-height:1.4}
+
+/* Flow arrows — aligned to column header text row */
+.flow-h-arrow{display:flex;align-items:center;justify-content:center;
+  width:18px;flex-shrink:0;color:#b0b8c1;font-size:18px;
+  align-self:flex-start;margin-top:7px;height:26px}
+
+/* Process columns wrapper */
+.proc-cols{display:flex;gap:6px;flex:1;min-width:0;align-items:flex-start}
+
+/* Individual process group column */
+.proc-col{width:100%;border-radius:var(--rl);border:1.5px solid transparent;overflow:hidden;display:flex;flex-direction:column}
+.proc-col-header{padding:7px 10px;height:40px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.proc-col-units{padding:6px;display:flex;flex-direction:column;gap:5px}
+.proc-col-outputs{padding:6px 8px 8px;border-top:1px dashed rgba(0,0,0,.1)}
+.outputs-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
+.output-item{font-size:10px;line-height:1.45;opacity:.85;padding:1px 0}
+.output-item::before{content:'→ ';opacity:.5}
+
+/* Unit nodes */
+.func-node{padding:7px 9px;border-radius:var(--r);cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+.func-node:hover{filter:brightness(.95)}
+.func-node.sel{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(26,101,200,.25)}
+.func-node-name{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:1px}
+.func-node-sub{font-size:10px;opacity:.7;line-height:1.3}
+
+/* Group colour tokens */
+.col-amber{flex:1;min-width:120px}
+.col-amber .proc-col{background:#fffbf0;border-color:#e8c050}
+.col-amber .proc-col-header{background:#fef3c7;color:#7a4a08}
+.col-amber .proc-col-outputs{border-top-color:#e8c05044}
+.col-amber .func-node{background:#fdf5dc;color:#6a3a08}
+.col-amber .func-node:hover{background:#fde89a}
+
+.col-red{flex:1;min-width:120px}
+.col-red .proc-col{background:#fff5f5;border-color:#e8a0a0}
+.col-red .proc-col-header{background:#fee2e2;color:#a02020}
+.col-red .proc-col-outputs{border-top-color:#e8a0a044}
+.col-red .func-node{background:#fdeaea;color:#801818}
+.col-red .func-node:hover{background:#fcc8c8}
+
+.col-blue{flex:1;min-width:120px}
+.col-blue .proc-col{background:#f4f8ff;border-color:#8090d8}
+.col-blue .proc-col-header{background:#dbeafe;color:#1a3090}
+.col-blue .proc-col-outputs{border-top-color:#8090d844}
+.col-blue .func-node{background:#e8f0fe;color:#102070}
+.col-blue .func-node:hover{background:#bcd4fc}
+
+.col-green{flex:1;min-width:120px}
+.col-green .proc-col{background:#f4fff6;border-color:#60b870}
+.col-green .proc-col-header{background:#dcfce7;color:#0f5025}
+.col-green .proc-col-outputs{border-top-color:#60b87044}
+.col-green .func-node{background:#e4fce8;color:#0a4018}
+.col-green .func-node:hover{background:#a8f0b8}
+
+/* Products out — true peer column, fixed width, no stretching */
+.products-col{display:flex;flex-direction:column;flex-shrink:0;
+  background:#f4f8ff;border:1.5px solid #8090d8;border-radius:var(--rl);
+  padding:0 12px 10px;width:130px}
+.products-col-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1a3090;
+  height:40px;display:flex;align-items:center}
+.product-out{font-size:10px;color:#1a2060;padding:2px 0;border-bottom:1px solid #c8d8f0;line-height:1.4}
+.product-out:last-child{border-bottom:none}
+.product-out-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;flex-shrink:0}
+
+/* Infrastructure basement */
+.infra-layer{margin-top:8px;border:1.5px dashed #a0a8b8;border-radius:var(--rl);
+  padding:10px 14px;background:#f8f9fb;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.infra-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#505878;white-space:nowrap;flex-shrink:0}
+.infra-span-arrow{font-size:13px;color:#a0a8b8;flex-shrink:0}
+.infra-nodes{display:flex;gap:7px;flex-wrap:wrap;flex:1}
+.infra-node{padding:6px 10px;border-radius:var(--r);border:1px solid #9090b0;
+  background:#ededf8;color:#303860;cursor:pointer;transition:all .15s;font-size:11px;font-weight:600}
+.infra-node:hover{background:#d8d8f0;border-color:#6060a0}
+.infra-node.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(26,101,200,.25);background:#dbeafe;color:#1a3090}
+.infra-sub{font-size:10px;font-weight:400;opacity:.7;display:block;margin-top:1px}
+.infra-desc{font-size:10px;color:#7080a0;flex-basis:100%;margin-top:4px;font-style:italic}
+
+/* Detail panel */
+.detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;min-height:140px;margin-top:16px}
 .detail-panel h3{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .unit-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--bg4);color:var(--text3)}
 .detail-desc{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:14px}
@@ -85,6 +168,14 @@ nav{padding:10px 8px;flex:1}
 .pain{background:var(--amber-dim);color:var(--amber-text)}
 .placeholder-msg{text-align:center;padding:32px 20px;color:var(--text3);font-size:13px}
 .placeholder-msg .big{font-size:32px;margin-bottom:10px}
+
+@media(max-width:768px){
+  .flow-main{gap:0}
+  .crude-col,.products-col{min-width:72px;padding:10px 6px}
+  .proc-col{min-width:100px}
+  .proc-cols{gap:5px}
+  .flow-h-arrow{padding:0 3px;font-size:16px}
+}
 
 /* QUESTIONS TAB */
 .q-section{margin-bottom:28px}
@@ -191,12 +282,34 @@ textarea{min-height:90px;resize:vertical}
 .welcome-footer{padding:0 28px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .w-dont-show{display:flex;align-items:center;gap:7px;font-size:12px;color:#7a828e;cursor:pointer;user-select:none}
 .w-dont-show input{width:14px;height:14px;cursor:pointer;accent-color:#1a65c8}
-@media(max-width:768px){
-  .welcome-box{max-width:100%}
-  .welcome-header{padding:22px 20px 18px}
-  .welcome-body{padding:18px 20px}
-  .welcome-footer{padding:0 20px 20px;flex-direction:column;align-items:stretch;text-align:center}
-}
+/* SITES */
+.seg-link{color:var(--accent);text-decoration:none;font-weight:600;border-bottom:1px solid var(--accent-dim);cursor:pointer;transition:color .12s}
+.seg-link:hover{color:var(--accent-text);border-bottom-color:var(--accent)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;cursor:pointer;margin-bottom:18px;font-family:var(--font);transition:all .12s}
+.back-btn:hover{color:var(--text);border-color:var(--border2)}
+.region-block{margin-bottom:28px}
+.region-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.site-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.site-card:hover{border-color:var(--border2)}
+.site-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.site-location{font-size:11px;color:var(--text3);margin-bottom:8px}
+.site-cap{font-size:12px;font-weight:600;color:var(--accent-text);font-family:var(--mono)}
+.site-cap-label{font-size:10px;color:var(--text3);margin-top:1px}
+.site-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.site-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.site-tag.crude-type{background:var(--amber-dim);color:var(--amber-text);border-color:transparent}
+.nav-sub{display:flex;align-items:center;gap:9px;padding:6px 12px 6px 28px;border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--text2);transition:all .12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.nav-sub:hover{background:var(--bg3);color:var(--text)}
+.nav-sub.active{background:var(--accent-dim);color:var(--accent-text)}
+.nav-sub svg{width:13px;height:13px;flex-shrink:0;opacity:.6}
+.nav-sub.active svg{opacity:1}
+@media(max-width:768px){.sites-grid{grid-template-columns:1fr 1fr}}
+.mplx-summary-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.mplx-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:12px 16px;flex:1;min-width:140px}
+.mplx-stat-val{font-size:16px;font-weight:600;color:var(--accent-text);font-family:var(--mono)}
+.mplx-stat-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+@media(max-width:768px){.mplx-summary-bar{gap:6px}.mplx-stat{min-width:calc(50% - 4px)}}
 </style>
 </head>
 <body>
@@ -207,10 +320,10 @@ textarea{min-height:90px;resize:vertical}
     <div class="welcome-header">
       <div class="w-badge">Radix BA Enablement</div>
       <h2>Refinery Basics Tool</h2>
-      <p>Your pre-call reference for discovery conversations</p>
+      <p>Your pre-call reference for Marathon Petroleum discovery conversations</p>
     </div>
     <div class="welcome-body">
-      <p>This tool helps provide you with a basic understanding how a refinery works, what questions to ask, and what your team has already learned. Four sections:</p>
+      <p>This tool helps you walk into any MPC conversation understanding how a refinery works, what questions to ask, and what your team has already learned. Four sections:</p>
       <div class="welcome-steps">
         <div class="w-step">
           <div class="w-step-num">⚙️</div>
@@ -275,16 +388,40 @@ textarea{min-height:90px;resize:vertical}
       <div class="nav-label">Learn</div>
       <button class="nav-item active" onclick="go('explorer')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        Process explorer
+        Process Explorer
       </button>
       <button class="nav-item" onclick="go('questions')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-        Discovery questions
+        Discovery Questions
+      </button>
+      <button class="nav-item" onclick="go('decision')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Decision Making
       </button>
       <div class="nav-label" style="margin-top:8px">Refinery Context</div>
       <button class="nav-item" onclick="go('segments')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-        Business segments
+        Business Segments
+      </button>
+      <button class="nav-sub" onclick="go('sites')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Sites
+      </button>
+      <button class="nav-sub" onclick="go('mplx-terminals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        MPLX Terminals
+      </button>
+      <button class="nav-sub" onclick="go('mplx-processing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Processing Complexes
+      </button>
+      <button class="nav-sub" onclick="go('mplx-pipelines')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        Pipelines & Gathering
+      </button>
+      <button class="nav-sub" onclick="go('renewable-sites')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12c0-2.76 1.12-5.26 2.93-7.07"/><path d="M12 6v6l4 2"/></svg>
+        Renewable Sites
       </button>
       <button class="nav-item" onclick="go('intel')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -304,12 +441,10 @@ textarea{min-height:90px;resize:vertical}
   <main class="main">
     <div id="sec-explorer" class="section active">
       <div class="page-header">
-        <h2>Refinery process explorer</h2>
-        <p>Select any unit to understand what it does, what drives decisions there, and the right questions to ask.</p>
+        <h2>Refinery Process Explorer</h2>
+        <p>Select any unit for a brief description of what it does, the typical KPI's that drive that unit, and potential questions to ask when looking at solutions in that unit.</p>
       </div>
-      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">CRUDE FLOW — LEFT TO RIGHT</div>
-      <div class="flow-strip" id="flow-strip"></div>
-      <div class="proc-grid" id="proc-grid"></div>
+      <div class="flow-diagram" id="flow-diagram"></div>
       <div class="detail-panel" id="detail-panel">
         <div class="placeholder-msg"><div class="big">⚙️</div>Select a process unit above to see details, KPIs, and discovery questions.</div>
       </div>
@@ -317,16 +452,16 @@ textarea{min-height:90px;resize:vertical}
 
     <div id="sec-questions" class="section">
       <div class="page-header">
-        <h2>Discovery question bank</h2>
-        <p>Organized by intent. Use before calls to prep — and after to identify gaps.</p>
+        <h2>Discovery Question Bank</h2>
+        <p>Organized by intent. Refer to before calls to prep — and after to identify gaps.</p>
       </div>
       <div id="all-questions"></div>
     </div>
 
     <div id="sec-segments" class="section">
       <div class="page-header">
-        <h2>MPC Business Segments (Based on public disclosures)</h2>
-        <p>Three distinct P&Ls, three different buying centers. Know which one you're in.</p>
+        <h2>MPC Business Segments (Based on publically available information)</h2>
+        <p>Three distinct P&Ls, three different buying centers. Know which one you're talking to.</p>
       </div>
       <div id="segments-content"></div>
     </div>
@@ -337,6 +472,74 @@ textarea{min-height:90px;resize:vertical}
         <p>Notes from client conversations. Admins add and manage — all BAs can read.</p>
       </div>
       <div id="intel-feed"></div>
+    </div>
+
+    <div id="sec-sites" class="section">
+      <button class="back-btn" onclick="go('segments')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Business segments
+      </button>
+      <div class="page-header">
+        <h2>Refining & Marketing — sites</h2>
+        <p>13 refineries across three regions. ~3 million barrels per calendar day total nameplate capacity.</p>
+      </div>
+      <div id="sites-content"></div>
+    </div>
+
+    <div id="sec-mplx-terminals" class="section">
+      <button class="back-btn" onclick="go('segments')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Business segments
+      </button>
+      <div class="page-header">
+        <h2>MPLX — Terminal Locations</h2>
+        <p>~40 million barrels total storage capacity across marine, pipeline, and inland terminals.</p>
+      </div>
+      <div id="mplx-terminals-content"></div>
+    </div>
+
+    <div id="sec-mplx-processing" class="section">
+      <button class="back-btn" onclick="go('segments')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Business segments
+      </button>
+      <div class="page-header">
+        <h2>MPLX — Processing Complexes</h2>
+        <p>~8.4 Bcf/d natural gas processing capacity and ~829 Mbpd NGL fractionation capacity across the Marcellus, Utica, Permian, and Mid-Continent.</p>
+      </div>
+      <div id="mplx-processing-content"></div>
+    </div>
+
+    <div id="sec-mplx-pipelines" class="section">
+      <button class="back-btn" onclick="go('segments')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Business segments
+      </button>
+      <div class="page-header">
+        <h2>MPLX — pipeline network & gathering systems</h2>
+        <p>~21,000 miles of owned, leased, or equity pipeline. Crude, refined products, and natural gas gathering spanning 9 states.</p>
+      </div>
+      <div id="mplx-pipelines-content"></div>
+    </div>
+
+    <div id="sec-renewable-sites" class="section">
+      <button class="back-btn" onclick="go('segments')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Business segments
+      </button>
+      <div class="page-header">
+        <h2>Renewable Diesel — Facilities</h2>
+        <p>Two operating facilities. ~914 million gallons per year combined capacity. Feedstock-flexible, RFS-compliant, and SAF-capable.</p>
+      </div>
+      <div id="renewable-sites-content"></div>
+    </div>
+
+    <div id="sec-decision" class="section">
+      <div class="page-header">
+        <h2>Understanding Decision Making Process</h2>
+        <p>How to prepare for a client conversation — who's in the room, what they care about, and how Radix fits.</p>
+      </div>
+      <div id="decision-content"></div>
     </div>
   </main>
 </div>
@@ -351,6 +554,10 @@ textarea{min-height:90px;resize:vertical}
     <button class="tab-btn" id="tab-questions" onclick="go('questions')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
       Questions
+    </button>
+    <button class="tab-btn" id="tab-decision" onclick="go('decision')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Decision
     </button>
     <button class="tab-btn" id="tab-segments" onclick="go('segments')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
@@ -529,15 +736,15 @@ const PROCESSES = [
 ];
 
 const SEGMENTS = [
-  {name:'Refining & marketing',icon:'🏭',
+  {name:'Refining & Marketing',icon:'🏭',link:true,
    desc:'The core business — 13 refineries, ~3M bpcd crude capacity across Gulf Coast, Mid-Continent, and West Coast. This is where the OT, reliability, process optimization, and energy management budget lives. Treat every refinery site as a semi-autonomous account.',
    contact:'Plant managers, refinery ops VPs, process engineers, reliability leads, site IT',
    subs:['Process optimization & APC','Energy management','Reliability / predictive maintenance','Environmental compliance (ULSD, RFS, CAA)','OT cybersecurity','Turnaround planning & execution','Historian & data infrastructure']},
-  {name:'Midstream — MPLX LP',icon:'🔗',
+  {name:'Midstream — MPLX LP',icon:'🔗',mplxLink:true,
    desc:'A separate publicly traded MLP (~64% owned by MPC). Operates pipelines, terminals, barge fleets, gas processing plants, and NGL fractionators. ~21,000 miles of pipeline, 40M bbl terminal storage. Separate P&L — treat as a distinct account with different buyers.',
    contact:'MPLX operations, terminal managers, pipeline integrity teams, SCADA engineers',
    subs:['Pipeline monitoring & integrity','Terminal automation & scheduling','SCADA & control systems','Gas processing optimization','NGL fractionation efficiency','Logistics & movement scheduling']},
-  {name:'Renewable diesel',icon:'🌱',
+  {name:'Renewable Diesel',icon:'🌱',renewableLink:true,
    desc:'Growing segment. Dickinson ND (184M gal/yr) and Martinez CA (730M gal/yr). Processes soybean oil, used cooking oil, tallow. Different unit ops from petroleum refining — feedstock variability and RFS compliance are the primary complexity drivers.',
    contact:'Renewable fuels operations, sustainability/ESG teams, feedstock procurement',
    subs:['Feedstock quality & variability management','RFS compliance & RIN tracking','Process control for novel unit ops','Yield optimization on diverse feedstocks','Carbon intensity monitoring']},
@@ -558,38 +765,176 @@ if (!loadNotes().length) saveNotes([
 ]);
 
 // NAV
+const SEGMENT_SUBPAGES = ['sites','mplx-terminals','mplx-processing','mplx-pipelines','renewable-sites'];
 function go(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-sub').forEach(b => b.classList.remove('active'));
   const sb = document.querySelector(`.nav-item[onclick="go('${name}')"]`);
   if (sb) sb.classList.add('active');
+  const ss = document.querySelector(`.nav-sub[onclick="go('${name}')"]`);
+  if (ss) ss.classList.add('active');
+  if (SEGMENT_SUBPAGES.includes(name)) {
+    const parent = document.querySelector(`.nav-item[onclick="go('segments')"]`);
+    if (parent) parent.classList.add('active');
+  }
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const tb = document.getElementById('tab-' + name);
   if (tb) tb.classList.add('active');
+  else if (SEGMENT_SUBPAGES.includes(name)) {
+    const el = document.getElementById('tab-segments');
+    if (el) el.classList.add('active');
+  }
   window.scrollTo(0, 0);
 }
 
-// PROCESS EXPLORER
-function renderFlowStrip() {
-  const sorted = [...PROCESSES].sort((a,b) => a.flow - b.flow);
-  document.getElementById('flow-strip').innerHTML = sorted.map((p,i) =>
-    `<span class="flow-chip ${selectedProc===p.id?'sel':''}" onclick="selectProc('${p.id}')">${p.name}</span>` +
-    (i < sorted.length-1 ? '<span class="flow-arrow">→</span>' : '')
-  ).join('');
+// PROCESS EXPLORER — FUNCTIONAL DIAGRAM
+const FLOW_COLS = [
+  {
+    id:'feedprep', col:'col-amber', label:'Feed preparation', icon:'🛢️',
+    procs:['cdu','vdu'],
+    outputs:['Naphtha (light)','Kerosene / jet blend','Gas oil (diesel blend)','Vacuum gas oil (VGO)','Atmospheric residue','Vacuum residue (bottoms)']
+  },
+  {
+    id:'conversion', col:'col-red', label:'Conversion', icon:'🔥',
+    procs:['fcc','hcc','coker'],
+    outputs:['High-octane FCC gasoline','LPG / propylene','Light cycle oil (LCO)','Hydrocracked diesel','Hydrocracked jet fuel','Coker naphtha & gas oil','Petroleum coke']
+  },
+  {
+    id:'treating', col:'col-blue', label:'Treating', icon:'🧪',
+    procs:['hdt','reform'],
+    outputs:['ULSD (≤15 ppm sulfur)','Hydrotreated naphtha','Low-sulfur jet fuel','High-octane reformate','H₂ (recycled to hydrotreaters)','Treated FCC feed']
+  },
+  {
+    id:'finishing', col:'col-green', label:'Blending & finishing', icon:'🔀',
+    procs:['blend'],
+    outputs:['Finished gasoline (RVP / octane spec)','Ultra-low sulfur diesel','Jet fuel (Jet-A / A-1)','Fuel oil / bunker','Asphalt','LPG / propane']
+  },
+];
+
+const INFRA_NODES = [
+  {id:'util', label:'Utilities & reliability', sub:'Steam · power · water · RBI'},
+  {id:'dcs',  label:'Control systems & automation', sub:'DCS · APC · SIS · Historian'},
+];
+
+function renderFlowDiagram() {
+  const diag = document.getElementById('flow-diagram');
+
+  // Legend
+  const dotColors = {col_amber:'#e8c050',col_red:'#e89090',col_blue:'#8090d8',col_green:'#60b870'};
+  const legendHTML = `
+    <div class="flow-legend">
+      ${FLOW_COLS.map(c=>`
+        <span class="legend-item">
+          <span class="legend-dot" style="background:${dotColors[c.col.replace('-','_')]}"></span>
+          ${c.label}
+        </span>`).join('<span style="color:var(--border2);font-size:13px">›</span>')}
+      <span style="margin-left:auto;font-size:11px;color:var(--text3);font-style:italic">Click any unit to explore ↓</span>
+    </div>`;
+
+  // Crude input column
+  const crudeHTML = `
+    <div class="crude-col">
+      <div class="crude-col-icon">🛳️</div>
+      <div class="crude-col-label">Crude oil input</div>
+      <div class="crude-col-sub">Sweet · Sour<br>Heavy · Light<br><br>~3M bpcd<br>(MPC network)</div>
+    </div>`;
+
+  // Process columns
+  const procColsHTML = FLOW_COLS.map((c, ci) => {
+    const isLast = ci === FLOW_COLS.length - 1;
+    const unitsHTML = c.procs.map(pid => {
+      const p = PROCESSES.find(x => x.id === pid);
+      return p ? `
+        <div class="func-node ${selectedProc===pid?'sel':''}" onclick="selectProc('${pid}')">
+          <div class="func-node-name">${p.icon} ${p.name}</div>
+          <div class="func-node-sub">${p.tag}</div>
+        </div>` : '';
+    }).join('');
+    const outputsHTML = c.outputs.map(o => `<div class="output-item">${o}</div>`).join('');
+    return `
+      <div class="${c.col}">
+        <div class="proc-col">
+          <div class="proc-col-header"><span>${c.icon}</span><span>${c.label}</span></div>
+          <div class="proc-col-units">${unitsHTML}</div>
+          <div class="proc-col-outputs">
+            <div class="outputs-label">${isLast ? 'Into finished products' : 'Outputs to next stage'}</div>
+            ${outputsHTML}
+          </div>
+        </div>
+      </div>`;
+  }).join('<div class="flow-h-arrow">→</div>');
+
+  // Fifth column — finished products
+  const finalProducts = [
+    {dot:'#e8c050',name:'Gasoline (regular & premium)'},
+    {dot:'#60b878',name:'Ultra-low sulfur diesel (ULSD)'},
+    {dot:'#8090d8',name:'Jet fuel (Jet-A)'},
+    {dot:'#e89090',name:'Liquefied petroleum gas (LPG)'},
+    {dot:'#b0b0b0',name:'Fuel oil / bunker fuel'},
+    {dot:'#a08060',name:'Asphalt / bitumen'},
+    {dot:'#c0a030',name:'Petrochemicals / NGLs'},
+    {dot:'#707070',name:'Petroleum coke'},
+  ];
+  const productsColHTML = `
+    <div class="products-col">
+      <div class="products-col-label">🏁 Finished products</div>
+      ${finalProducts.map(p=>`
+        <div class="product-out">
+          <span class="product-out-dot" style="background:${p.dot}"></span>${p.name}
+        </div>`).join('')}
+    </div>`;
+
+  // Main flow row — 6 elements: crude | → | proc-cols | → | products
+  const mainHTML = `
+    <div class="flow-main">
+      ${crudeHTML}
+      <div class="flow-h-arrow">→</div>
+      <div class="proc-cols">${procColsHTML}</div>
+      <div class="flow-h-arrow">→</div>
+      ${productsColHTML}
+    </div>`;
+
+  // Infrastructure basement
+  const infraHTML = `
+    <div class="infra-layer">
+      <div class="infra-label">⚙️ Infrastructure — spans all stages</div>
+      <div class="infra-span-arrow">↕</div>
+      <div class="infra-nodes">
+        ${INFRA_NODES.map(n=>`
+          <div class="infra-node ${selectedProc===n.id?'sel':''}" onclick="selectProc('${n.id}')">
+            ${n.label}<span class="infra-sub">${n.sub}</span>
+          </div>`).join('')}
+      </div>
+      <div class="infra-desc">These systems underpin every stage above. DCS controls the process. Utilities keep it running. Click either to explore.</div>
+    </div>`;
+
+  diag.innerHTML = legendHTML + mainHTML + infraHTML;
 }
-function renderGrid() {
-  document.getElementById('proc-grid').innerHTML = PROCESSES.map(p =>
-    `<div class="proc-card ${selectedProc===p.id?'sel':''}" onclick="selectProc('${p.id}')">
-      <div class="icon">${p.icon}</div><div class="name">${p.name}</div><div class="tag">${p.tag}</div>
-    </div>`
-  ).join('');
-}
+
 function selectProc(id) {
-  selectedProc = id; renderGrid(); renderFlowStrip();
+  selectedProc = id;
+  renderFlowDiagram();
   const p = PROCESSES.find(x => x.id === id); if (!p) return;
+
+  // Find group for badge
+  const grp = FLOW_COLS.find(g => g.procs.includes(id));
+  const isInfra = INFRA_NODES.some(n => n.id === id);
+  const grpBadge = grp
+    ? `<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;
+        background:${grp.col==='col-amber'?'#fef3c7':grp.col==='col-red'?'#fee2e2':grp.col==='col-blue'?'#dbeafe':'#dcfce7'};
+        color:${grp.col==='col-amber'?'#7a4a08':grp.col==='col-red'?'#a02020':grp.col==='col-blue'?'#1a3090':'#0f5025'}">${grp.label}</span>`
+    : isInfra
+    ? `<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;background:#ededf8;color:#303860">Infrastructure</span>`
+    : '';
+
   document.getElementById('detail-panel').innerHTML = `
-    <h3>${p.icon} ${p.name} <span class="unit-tag">${p.tag}</span></h3>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <h3 style="margin:0">${p.icon} ${p.name}</h3>
+      <span class="unit-tag">${p.tag}</span>
+      ${grpBadge}
+    </div>
     <p class="detail-desc">${p.desc}</p>
     <div class="qs-label">Typical KPIs</div>
     <div class="kpi-row">${p.kpis.map(k=>`<div class="kpi-chip"><div class="val">${k.v}</div><div class="lbl">${k.k}</div></div>`).join('')}</div>
@@ -633,14 +978,434 @@ function renderSegments() {
     <div class="seg-card">
       <div class="seg-header">
         <div class="seg-icon">${s.icon}</div>
-        <div><h3>${s.name}</h3><div class="seg-contact">${s.contact}</div></div>
+        <div>
+          <h3>${s.link ? `<a class="seg-link" onclick="go('sites')">${s.name}</a>` : s.mplxLink ? `<a class="seg-link" onclick="go('mplx-terminals')">${s.name}</a>` : s.renewableLink ? `<a class="seg-link" onclick="go('renewable-sites')">${s.name}</a>` : s.name}</h3>
+          <div class="seg-contact">${s.contact}</div>
+        </div>
       </div>
       <p class="seg-desc">${s.desc}</p>
       <div class="tag-cloud">${s.subs.map(sub=>`<span class="tag-pill">${sub}</span>`).join('')}</div>
     </div>`).join('');
 }
 
-// INTEL
+const REFINERIES = [
+  {region:'Gulf Coast',sites:[
+    {name:'Galveston Bay',location:'Texas City, TX',capacity:'661',crude:'Heavy sour / sweet / light',tags:['Largest US refinery complex','Hydrocracking','Coking','FCC','Lubricants','Specialty products','Two integrated facilities']},
+    {name:'Garyville',location:'Garyville, LA',capacity:'578',crude:'Heavy sour',tags:['Hydrocracking','Coking','FCC','Deep conversion']},
+  ]},
+  {region:'Mid-Continent',sites:[
+    {name:'Catlettsburg',location:'Catlettsburg, KY',capacity:'277',crude:'Sweet / sour',tags:['Largest Mid-Con refinery','FCC','Coking']},
+    {name:'Robinson',location:'Robinson, IL',capacity:'253',crude:'Sweet / sour',tags:['OSHA VPP Star','NGLs','Petrochemicals']},
+    {name:'Illinois (Joliet)',location:'Joliet, IL',capacity:'204',crude:'Sweet / light',tags:['BP JV site','FCC','Gasoline focus']},
+    {name:'Detroit',location:'Detroit, MI',capacity:'144',crude:'Heavy sour',tags:['Only Michigan refinery','Asphalt','OSHA VPP Star']},
+    {name:'St. Paul Park',location:'St. Paul Park, MN',capacity:'105',crude:'Sweet / sour',tags:['Mississippi River site','Asphalt','NGLs']},
+    {name:'Canton',location:'Canton, OH',capacity:'100',crude:'Sweet / sour',tags:['Utica Shale feed','OSHA VPP Star','Asphalt']},
+  ]},
+  {region:'West Coast',sites:[
+    {name:'Los Angeles',location:'Carson, CA',capacity:'363',crude:'Heavy sour',tags:['Largest West Coast refinery','Coking','FCC','CARB fuels']},
+    {name:'Martinez',location:'Martinez, CA',capacity:'166',crude:'Sweet / light',tags:['Renewable diesel conversion','SAF','Low-carbon fuels']},
+    {name:'Salt Lake City',location:'Salt Lake City, UT',capacity:'68',crude:'Sweet (WY/UT/CO)',tags:['Landlocked crude','NGLs','Gasoline focus']},
+    {name:'Mandan',location:'Mandan, ND',capacity:'74',crude:'Sweet (Bakken)',tags:['Bakken crude','Asphalt','NGLs']},
+  ]},
+];
+
+function renderSites() {
+  document.getElementById('sites-content').innerHTML = REFINERIES.map(r=>`
+    <div class="region-block">
+      <div class="region-title">${r.region}</div>
+      <div class="sites-grid">${r.sites.map(s=>`
+        <div class="site-card">
+          <div class="site-name">${s.name}</div>
+          <div class="site-location">${s.location}</div>
+          <div class="site-cap">${s.capacity} <span style="font-size:10px;font-weight:400;color:var(--text3)">mbpcd</span></div>
+          <div class="site-cap-label">Nameplate capacity</div>
+          <div class="site-tags">
+            <span class="site-tag crude-type">${s.crude}</span>
+            ${s.tags.map(t=>`<span class="site-tag">${t}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+const MPLX_TERMINALS = [
+  {region:'Gulf Coast & Gulf of Mexico',stats:'~12M bbl storage | Marine & pipeline receipt',terminals:[
+    {name:'Galveston Bay Marine Terminal',location:'Texas City, TX',storage:'~4.5M bbl',type:'Marine',tags:['Crude import','Product export','Deepwater access','Barge & tanker']},
+    {name:'Garyville Terminal',location:'Garyville, LA',storage:'~2.1M bbl',type:'Pipeline',tags:['Crude receipt','Mississippi River','Pipeline connected']},
+    {name:'Corpus Christi Terminal',location:'Corpus Christi, TX',storage:'~1.8M bbl',type:'Marine',tags:['Crude & condensate','Export capable','Eagle Ford supply']},
+    {name:'New Orleans / Meraux Terminal',location:'St. Bernard Parish, LA',storage:'~1.2M bbl',type:'Marine',tags:['River terminal','Product distribution','Barge receipt']},
+  ]},
+  {region:'Mid-Continent',stats:'~15M bbl storage | Inland pipeline & rack terminals',terminals:[
+    {name:'Catlettsburg Terminal',location:'Catlettsburg, KY',storage:'~2.4M bbl',type:'Pipeline',tags:['Refinery-integrated','Product rundown','Pipeline distribution']},
+    {name:'Robinson Terminal',location:'Robinson, IL',storage:'~1.6M bbl',type:'Pipeline',tags:['Refined products','Truck rack','Pipeline connected']},
+    {name:'Findlay / Wood County Terminal',location:'Findlay, OH',storage:'~1.1M bbl',type:'Pipeline',tags:['Refined products','Truck rack','TEPPCO / Buckeye connected']},
+    {name:'Detroit Terminal',location:'Detroit, MI',storage:'~900K bbl',type:'Pipeline',tags:['Refinery-adjacent','Product distribution','Rail capable']},
+    {name:'Indianapolis Terminal',location:'Indianapolis, IN',storage:'~750K bbl',type:'Pipeline',tags:['Refined products','Truck rack','Midwest hub']},
+    {name:'Nashville Terminal',location:'Nashville, TN',location2:'',storage:'~650K bbl',type:'Pipeline',tags:['Refined products','Truck rack','Southeast supply']},
+  ]},
+  {region:'West Coast',stats:'~8M bbl storage | Marine & pipeline terminals',terminals:[
+    {name:'Carson / Wilmington Terminal',location:'Carson, CA',storage:'~3.2M bbl',type:'Marine/Pipeline',tags:['Crude receipt','CARB products','Marine & pipeline']},
+    {name:'Martinez Terminal',location:'Martinez, CA',storage:'~1.4M bbl',type:'Marine/Pipeline',tags:['Renewable diesel','SAF','Pipeline connected','San Francisco Bay']},
+    {name:'Salt Lake City Terminal',location:'Salt Lake City, UT',storage:'~600K bbl',type:'Pipeline',tags:['Refined products','Truck rack','Landlocked market']},
+  ]},
+];
+
+const MPLX_PROCESSING = [
+  {region:'Marcellus / Utica (Appalachia)',stats:'~3.2 Bcf/d processing | ~360 Mbpd fractionation',complexes:[
+    {name:'Sherwood Complex',location:'Doddridge County, WV',capacity:'1.5 Bcf/d',type:'Cryogenic processing',tags:['Largest MPLX complex','Wet gas processing','NGL extraction','Marcellus Shale']},
+    {name:'Mobley Complex',location:'Wetzel County, WV',capacity:'800 MMcf/d',type:'Cryogenic processing',tags:['Marcellus wet gas','NGL recovery','Pipeline interconnect']},
+    {name:'Utica East Ohio (UEO)',location:'Harrison County, OH',capacity:'600 MMcf/d',type:'Cryogenic + fractionation',tags:['Utica Shale','NGL fractionation','Ethane recovery','Equity JV']},
+    {name:'Hopedale Complex',location:'Harrison County, OH',capacity:'300 MMcf/d',type:'Cryogenic processing',tags:['Utica dry gas','Compression','Gathering integrated']},
+  ]},
+  {region:'Permian Basin',stats:'~1.1 Bcf/d processing | ~160 Mbpd fractionation',complexes:[
+    {name:'Agua Dulce / Waha Hub',location:'West Texas',capacity:'600 MMcf/d',type:'Residue & NGL processing',tags:['Permian Basin','Residue gas','Waha pricing hub','NGL pipeline']},
+    {name:'Midland Basin Gathering',location:'Midland Basin, TX',capacity:'500 MMcf/d',type:'Cryogenic processing',tags:['Delaware & Midland Basin','NGL extraction','Growing capacity']},
+  ]},
+  {region:'Mid-Continent & Southwest',stats:'~4.1 Bcf/d processing | ~309 Mbpd fractionation',complexes:[
+    {name:'Harmon Creek Complex',location:'Washington County, PA',capacity:'600 MMcf/d',type:'Cryogenic processing',tags:['Dry Utica','Ethane recovery','Pipeline connected']},
+    {name:'ATEX / Cornerstone Pipeline Hub',location:'Kenova, WV',capacity:'200 Mbpd NGL',type:'NGL fractionation',tags:['Ethane pipeline','Gulf Coast destination','C2 recovery']},
+    {name:'Javelina Gas Plant',location:'Corpus Christi, TX',capacity:'325 MMcf/d',type:'Refinery gas processing',tags:['Refinery off-gas','NGL recovery','Coastal corridor']},
+    {name:'Whistler / Rio Bravo Interest',location:'South Texas',capacity:'2.0 Bcf/d',type:'Residue pipeline',tags:['Equity interest','Waha to Agua Dulce','Permian offtake']},
+  ]},
+];
+
+const MPLX_PIPELINES = [
+  {region:'Crude oil pipelines',stats:'~5,900 miles | ~1.7 MMbpd throughput capacity',systems:[
+    {name:'Ozark Pipeline',coverage:'Cushing, OK → Wood River, IL',length:'443 miles',throughput:'350 Mbpd',tags:['Canadian / WTI crude','Midwest supply','Bidirectional capable']},
+    {name:'Capline Pipeline (equity)',coverage:'St. James, LA → Patoka, IL',length:'635 miles',throughput:'~1.2 MMbpd (nameplate)',tags:['Major Gulf Coast trunk line','Reversal completed 2022','Heavy crude northbound']},
+    {name:'Louisiana Offshore Oil Port (LOOP) — equity',coverage:'Gulf of Mexico → Onshore LA',length:'Offshore + pipeline',throughput:'1.3 MMbpd capable',tags:['Deepwater crude import','VLCC capable','Strategic asset']},
+    {name:'Tesoro Crude Pipeline',coverage:'Bakken, ND → Mandan, ND',length:'~85 miles',throughput:'60 Mbpd',tags:['Bakken shale','Mandan refinery supply','Gathering system']},
+  ]},
+  {region:'Refined products pipelines',stats:'~9,100 miles | Multi-product & dedicated lines',systems:[
+    {name:'Marathon Pipe Line (MPL)',coverage:'IL, IN, OH, MI, KY, TN, GA',length:'~1,700 miles',throughput:'~600 Mbpd combined',tags:['Multi-product','Gasoline / distillate','Southeast corridor']},
+    {name:'TEPPCO / Buckeye (equity interests)',coverage:'Midwest & Northeast',length:'Equity — not operated',throughput:'Varies by segment',tags:['Equity interest','Refined products','Ohio / Indiana hub']},
+    {name:'Southwest Ohio Pipeline',coverage:'Cincinnati / Dayton, OH',length:'~100 miles',throughput:'80 Mbpd',tags:['Refined products','Truck rack supply','Local distribution']},
+    {name:'Kenai Pipe Line',coverage:'Kenai, AK',length:'~17 miles',throughput:'Local',tags:['Alaska operations','Refined products','Local market']},
+  ]},
+  {region:'Natural gas gathering & transmission',stats:'~6,000 miles gathering | ~12.4 Bcf/d processing throughput',systems:[
+    {name:'Sherwood / Mobley Gathering',coverage:'Northern WV (Marcellus)',length:'~800 miles',throughput:'1.5+ Bcf/d',tags:['High-pressure gathering','Wet gas','Compressor stations','Appalachian backbone']},
+    {name:'Utica East Ohio Gathering',coverage:'Eastern OH (Utica)',length:'~400 miles',throughput:'600 MMcf/d',tags:['Utica Shale','Low-pressure gathering','Compressor integration']},
+    {name:'Permian Basin Gathering',coverage:'Midland & Delaware Basin, TX',length:'~700 miles',throughput:'500+ MMcf/d',tags:['Rapid growth area','Associated gas','Residue & NGL takeaway']},
+    {name:'NEXUS Gas Transmission (equity)',coverage:'OH → MI → Ontario',length:'256 miles',throughput:'1.5 Bcf/d',tags:['Dry Utica / Marcellus','Dawn Hub access','Equity JV with DT Midstream']},
+    {name:'Rover Pipeline (equity)',coverage:'WV/OH/PA → Michigan Hub',length:'713 miles',throughput:'3.25 Bcf/d',tags:['Major Appalachian trunkline','Equity interest','Midwest / Canada access']},
+  ]},
+];
+
+function renderMplxTerminals() {
+  document.getElementById('mplx-terminals-content').innerHTML =
+    `<div class="mplx-summary-bar">
+      <div class="mplx-stat"><div class="mplx-stat-val">~40M bbl</div><div class="mplx-stat-lbl">Total storage capacity</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">~8,900</div><div class="mplx-stat-lbl">Retail & marketing locations</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">3 coasts</div><div class="mplx-stat-lbl">Gulf, Mid-Con & West Coast</div></div>
+    </div>` +
+    MPLX_TERMINALS.map(r=>`
+    <div class="region-block">
+      <div class="region-title">${r.region} <span style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px;color:var(--text3)">${r.stats}</span></div>
+      <div class="sites-grid">${r.terminals.map(t=>`
+        <div class="site-card">
+          <div class="site-name">${t.name}</div>
+          <div class="site-location">${t.location}</div>
+          <div class="site-cap">${t.storage}</div>
+          <div class="site-cap-label">Storage capacity</div>
+          <div class="site-tags">
+            <span class="site-tag crude-type">${t.type}</span>
+            ${t.tags.map(x=>`<span class="site-tag">${x}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderMplxProcessing() {
+  document.getElementById('mplx-processing-content').innerHTML =
+    `<div class="mplx-summary-bar">
+      <div class="mplx-stat"><div class="mplx-stat-val">~8.4 Bcf/d</div><div class="mplx-stat-lbl">Gas processing capacity</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">~829 Mbpd</div><div class="mplx-stat-lbl">NGL fractionation capacity</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">4 basins</div><div class="mplx-stat-lbl">Appalachia, Permian, Mid-Con, SW</div></div>
+    </div>` +
+    MPLX_PROCESSING.map(r=>`
+    <div class="region-block">
+      <div class="region-title">${r.region} <span style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px;color:var(--text3)">${r.stats}</span></div>
+      <div class="sites-grid">${r.complexes.map(c=>`
+        <div class="site-card">
+          <div class="site-name">${c.name}</div>
+          <div class="site-location">${c.location}</div>
+          <div class="site-cap">${c.capacity}</div>
+          <div class="site-cap-label">${c.type}</div>
+          <div class="site-tags">
+            ${c.tags.map(x=>`<span class="site-tag">${x}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderMplxPipelines() {
+  document.getElementById('mplx-pipelines-content').innerHTML =
+    `<div class="mplx-summary-bar">
+      <div class="mplx-stat"><div class="mplx-stat-val">~21,000 mi</div><div class="mplx-stat-lbl">Total pipeline network</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">~1.7 MMbpd</div><div class="mplx-stat-lbl">Crude throughput capacity</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">~12.4 Bcf/d</div><div class="mplx-stat-lbl">Gas gathering & transmission</div></div>
+    </div>` +
+    MPLX_PIPELINES.map(r=>`
+    <div class="region-block">
+      <div class="region-title">${r.region} <span style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px;color:var(--text3)">${r.stats}</span></div>
+      <div class="sites-grid">${r.systems.map(p=>`
+        <div class="site-card">
+          <div class="site-name">${p.name}</div>
+          <div class="site-location" style="margin-bottom:6px">${p.coverage}</div>
+          <div style="display:flex;gap:12px;margin-bottom:6px">
+            <div><div class="site-cap">${p.length}</div><div class="site-cap-label">Length</div></div>
+            <div><div class="site-cap">${p.throughput}</div><div class="site-cap-label">Throughput</div></div>
+          </div>
+          <div class="site-tags">${p.tags.map(x=>`<span class="site-tag">${x}</span>`).join('')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// RENEWABLE SITES
+const RENEWABLE_SITES = [
+  {
+    name:'Dickinson Renewable Fuels',
+    location:'Dickinson, ND',
+    capacity_gal:'184 million gal/yr',
+    capacity_bpd:'~12,000 bpd',
+    status:'Operating',
+    converted:'Converted 2021 (former petroleum refinery)',
+    feedstocks:['Soybean oil','Canola oil','Corn oil','Used cooking oil (UCO)'],
+    products:['Renewable diesel (ASTM D975)','Naphtha co-product'],
+    tags:['Cold-weather RD performance','Midwest feedstock supply','RFS RIN generator','Inland location — no marine logistics'],
+    tech:['Hydrotreating-based conversion','Feedstock pretreatment','Hydrogen integration','ISBL / OSBL optimization'],
+    notes:'Dickinson was the first MPC renewable conversion. Smaller scale but fully operational and optimized. Key challenge: feedstock cost variability and cold-flow properties of RD in ND winters. No SAF capability currently.'
+  },
+  {
+    name:'Martinez Renewable Fuels',
+    location:'Martinez, CA',
+    capacity_gal:'730 million gal/yr',
+    capacity_bpd:'~48,000 bpd',
+    status:'Operating (Phase 2 complete 2023)',
+    converted:'Converted 2022–2023 (former Tesoro / MPC petroleum refinery)',
+    feedstocks:['Soybean oil','Used cooking oil (UCO)','Tallow (animal fat)','Distillers corn oil','Canola oil','Potential: algae oil, municipal waste fats'],
+    products:['Renewable diesel (ASTM D975)','Sustainable aviation fuel (SAF)','Renewable naphtha'],
+    tags:['Largest US renewable diesel facility','SAF-capable','CARB LCFS credit generator','Marine terminal — Bay Area access','West Coast distribution'],
+    tech:['Multi-feedstock pretreatment','Hydroprocessing (HEFA pathway)','SAF fractionation unit','Carbon intensity (CI) tracking','LCFS & RFS compliance stack'],
+    notes:'Martinez is the flagship renewable asset. At ~730M gal/yr it is the largest RD facility in the US. SAF capability is a key differentiator — California mandates make CI score critical. Feedstock flexibility is the primary operational and technology challenge: tracking CI scores per feedstock lot, blending to optimize CI vs. cost, and managing variable pretreatment requirements.'
+  }
+];
+
+function renderRenewableSites() {
+  document.getElementById('renewable-sites-content').innerHTML =
+    `<div class="mplx-summary-bar">
+      <div class="mplx-stat"><div class="mplx-stat-val">~914M gal/yr</div><div class="mplx-stat-lbl">Combined RD capacity</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">~60,000 bpd</div><div class="mplx-stat-lbl">Combined throughput</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">SAF-capable</div><div class="mplx-stat-lbl">Martinez (CA) only</div></div>
+      <div class="mplx-stat"><div class="mplx-stat-val">HEFA pathway</div><div class="mplx-stat-lbl">Hydroprocessed esters & fatty acids</div></div>
+    </div>` +
+    RENEWABLE_SITES.map(s=>`
+    <div class="seg-card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--text)">${s.name}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">${s.location} &nbsp;·&nbsp; ${s.converted}</div>
+        </div>
+        <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:var(--green-text);white-space:nowrap">${s.status}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:14px">
+        <div class="kpi-chip"><div class="val">${s.capacity_gal}</div><div class="lbl">Annual capacity</div></div>
+        <div class="kpi-chip"><div class="val">${s.capacity_bpd}</div><div class="lbl">Daily throughput</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <div class="qs-label">Feedstocks processed</div>
+          <div class="tag-cloud">${s.feedstocks.map(f=>`<span class="tag-pill" style="background:var(--amber-dim);border-color:transparent;color:var(--amber-text)">${f}</span>`).join('')}</div>
+        </div>
+        <div>
+          <div class="qs-label">Products</div>
+          <div class="tag-cloud">${s.products.map(p=>`<span class="tag-pill" style="background:var(--green-dim);border-color:transparent;color:var(--green-text)">${p}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="qs-label">Key technology areas</div>
+        <div class="tag-cloud">${s.tech.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:12px;font-size:13px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text);display:block;margin-bottom:4px">Site notes</strong>${s.notes}
+      </div>
+      <div style="margin-top:12px">
+        <div class="qs-label">Other characteristics</div>
+        <div class="tag-cloud">${s.tags.map(t=>`<span class="site-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+// DECISION MAKING
+const DECISION_SLIDES = [
+  {
+    num:'01',
+    title:'The three groups you\'re likely talking to',
+    color:'accent',
+    groups:[
+      {icon:'⚙️',name:'Site / Operations teams',sub:'Refineries & Midstream',care:'Uptime, reliability, ease of use',influence:'HIGH',lang:'Practical, results-focused',tip:'They drive demand. Start here to find pain.'},
+      {icon:'💻',name:'Digital / IT / Platform teams',sub:'IT or Innovation group',care:'Architecture, scalability, governance',influence:'HIGH',lang:'Technical, structured',tip:'They approve execution. Speak architecture and integration.'},
+      {icon:'📊',name:'Business / Leadership',sub:'VPs, Directors, C-suite',care:'Margin, cost, risk',influence:'VERY HIGH',lang:'Outcomes, not details',tip:'They fund work. Lead with $/bbl and ROI — never feature lists.'},
+    ],
+    flow:['Operations feels pain','Radix helps fix it','Value becomes visible','Leadership hears about it','Funding follows'],
+    flowNote:'Radix needs to help accelerate this loop.'
+  },
+  {
+    num:'02',
+    title:'Where Radix fits — by segment',
+    color:'green',
+    intro:'Client\'s scale means even a modest custom tool, deployed network-wide, creates significant value. We are not "supporting the platform" or "closing tickets" — we are the partner to unify their data and help them get away from Excel-based solutions.',
+    positioning:[
+      {segment:'Refining',items:['Equipment lifecycle tracking (heat exchangers, furnaces)','Unit optimization (UHM, catalyst life)','Turnaround planning','Energy optimization']},
+      {segment:'Midstream',items:['Flow optimization','Leak detection','Asset integrity']},
+      {segment:'Enterprise',items:['Scheduling & blending','Supply chain optimization']},
+    ]
+  },
+  {
+    num:'03',
+    title:'Speaking the client\'s language',
+    color:'teal',
+    intro:'Every conversation should map to one of these five value drivers. If you can\'t connect your pitch to at least one, rethink the pitch.',
+    drivers:[
+      {num:'1',name:'Safety & Reliability',desc:'Always first. Any solution that improves uptime or reduces risk gets attention at every level.'},
+      {num:'2',name:'Margin optimization',desc:'Cost/barrel, product yields, throughput improvement. Quantify it — "+1% yield" beats "AI model" every time.'},
+      {num:'3',name:'Capital discipline',desc:'What\'s the initiative ROI? Payback period? MPC thinks in capital cycles.'},
+      {num:'4',name:'Operational excellence',desc:'Efficiency improvements, energy efficiency, reducing manual workflows.'},
+      {num:'5',name:'Practical sustainability',desc:'Reduce emissions where practical. Tie to existing regulations — RFS, CARB LCFS, EPA.'},
+    ]
+  },
+  {
+    num:'04',
+    title:'Before & during a meeting',
+    color:'amber',
+    before:['What\'s the objective?','What do I know?','What do I not know?','What\'s the ideal outcome?'],
+    during:['What was said?','What was implied?','What changed in their priorities?'],
+    note:'Write these down. Not in your head — on paper or in notes. The discipline of writing forces clarity before you walk in.'
+  },
+  {
+    num:'05',
+    title:'How to find and grow opportunities',
+    color:'accent',
+    tactics:[
+      {num:'1',name:'Listen to the complaints',desc:'Ask to follow up on every pain point mentioned. Complaints are budget requests waiting to happen.'},
+      {num:'2',name:'Follow the margin',desc:'Throughput, yield, energy costs, downtime. These are the four levers. Find which one is bleeding.'},
+      {num:'3',name:'Look for friction',desc:'Manual processes, team misalignments, Excel-based workflows. Friction = opportunity.'},
+      {num:'4',name:'Understand high-value moments',desc:'TAR (turnaround), planning cycles, scheduling windows. That\'s when decisions get made and budgets open.'},
+      {num:'5',name:'Think system, not single unit',desc:'A solution that works at one site is a project. A solution that scales across 13 refineries is a platform.'},
+      {num:'6',name:'We are not Digital Transformation',desc:'Don\'t position Radix as a DX initiative — those get scrutinized, delayed, and killed. Position as operational enablement.'},
+    ],
+    howToFind:[
+      {step:'Start with pain',detail:'Downtime / Variability / Manual workflows'},
+      {step:'Tie to dollars',detail:'$/bbl margin impact / Throughput gains / Cost reduction'},
+      {step:'Map to system',detail:'Where does it sit in the value chain?'},
+      {step:'Sell outcomes, not tech',detail:'\"+1% yield\" > \"AI model\"'},
+    ]
+  }
+];
+
+const SLIDE_COLORS = {
+  accent:{bg:'var(--accent-dim)',text:'var(--accent-text)',border:'var(--accent)'},
+  green:{bg:'var(--green-dim)',text:'var(--green-text)',border:'var(--green)'},
+  teal:{bg:'var(--teal-dim)',text:'var(--teal-text)',border:'var(--teal)'},
+  amber:{bg:'var(--amber-dim)',text:'var(--amber-text)',border:'var(--amber)'},
+};
+
+function renderDecision() {
+  document.getElementById('decision-content').innerHTML = DECISION_SLIDES.map(slide => {
+    const c = SLIDE_COLORS[slide.color];
+    let body = '';
+
+    if (slide.groups) {
+      body = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:18px">
+          ${slide.groups.map(g=>`
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+              <div style="font-size:20px;margin-bottom:6px">${g.icon}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${g.name}</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:10px">${g.sub}</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px"><strong>Care about:</strong> ${g.care}</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px"><strong>Language:</strong> ${g.lang}</div>
+              <div style="font-size:11px;padding:6px 8px;background:${c.bg};color:${c.text};border-radius:var(--r);margin-top:8px;line-height:1.5">${g.tip}</div>
+            </div>`).join('')}
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+          <div class="qs-label" style="margin-bottom:10px">Typical buying cycle — accelerate this loop</div>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+            ${slide.flow.map((f,i)=>`
+              <span style="font-size:12px;padding:5px 10px;background:${c.bg};color:${c.text};border-radius:20px;font-weight:500">${f}</span>
+              ${i<slide.flow.length-1?'<span style="color:var(--text3);font-size:12px">→</span>':''}
+            `).join('')}
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:8px;font-style:italic">${slide.flowNote}</div>
+        </div>`;
+    } else if (slide.positioning) {
+      body = `
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;padding:12px 14px;background:${c.bg};border-radius:var(--r);color:${c.text}">${slide.intro}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+          ${slide.positioning.map(seg=>`
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">${seg.segment}</div>
+              ${seg.items.map(item=>`<div style="font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border);line-height:1.4">${item}</div>`).join('')}
+            </div>`).join('')}
+        </div>`;
+    } else if (slide.drivers) {
+      body = `
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">${slide.intro}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${slide.drivers.map(d=>`
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r)">
+              <span style="width:24px;height:24px;border-radius:50%;background:${c.bg};color:${c.text};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${d.num}</span>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${d.name}</div><div style="font-size:13px;color:var(--text2);line-height:1.55">${d.desc}</div></div>
+            </div>`).join('')}
+        </div>`;
+    } else if (slide.before) {
+      body = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+            <div class="qs-label" style="margin-bottom:10px">Before every meeting</div>
+            ${slide.before.map(q=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)"><span style="color:${c.text};font-weight:700;flex-shrink:0">→</span>${q}</div>`).join('')}
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+            <div class="qs-label" style="margin-bottom:10px">During meetings / calls</div>
+            ${slide.during.map(q=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)"><span style="color:${c.text};font-weight:700;flex-shrink:0">→</span>${q}</div>`).join('')}
+          </div>
+        </div>
+        <div style="background:${c.bg};color:${c.text};border-radius:var(--r);padding:12px 14px;font-size:13px;line-height:1.6">${slide.note}</div>`;
+    } else if (slide.tactics) {
+      body = `
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:18px">
+          ${slide.tactics.map(t=>`
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r)">
+              <span style="width:22px;height:22px;border-radius:50%;background:${c.bg};color:${c.text};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${t.num}</span>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${t.name}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${t.desc}</div></div>
+            </div>`).join('')}
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px">
+          <div class="qs-label" style="margin-bottom:10px">How to find opportunities — the 4-step filter</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
+            ${slide.howToFind.map((h,i)=>`
+              <div style="padding:10px 12px;background:${c.bg};border-radius:var(--r)">
+                <div style="font-size:10px;font-weight:700;color:${c.text};margin-bottom:4px">STEP ${i+1}</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px">${h.step}</div>
+                <div style="font-size:11px;color:var(--text2)">${h.detail}</div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:16px">
+        <div style="padding:16px 20px;background:${c.bg};border-bottom:1px solid ${c.border};display:flex;align-items:center;gap:12px">
+          <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:${c.text};background:rgba(255,255,255,.5);padding:3px 8px;border-radius:4px">${slide.num}</span>
+          <h3 style="font-size:14px;font-weight:600;color:${c.text}">${slide.title}</h3>
+        </div>
+        <div style="padding:18px 20px">${body}</div>
+      </div>`;
+  }).join('');
+}
 function updateCounts() {
   const n = loadNotes().length;
   document.getElementById('intel-count-sidebar').textContent = n;
@@ -751,7 +1516,7 @@ if (localStorage.getItem(WELCOME_KEY)) {
 }
 
 // INIT
-renderFlowStrip(); renderGrid(); renderAllQuestions(); renderSegments(); renderIntel();
+renderFlowDiagram(); renderAllQuestions(); renderSegments(); renderSites(); renderMplxTerminals(); renderMplxProcessing(); renderMplxPipelines(); renderRenewableSites(); renderDecision(); renderIntel();
 </script>
 </body>
 </html>
